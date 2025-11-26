@@ -11,22 +11,15 @@ pluginManagement {
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
     repositories {
-        // ensure plugin artifacts can be resolved
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
-
-// Ensure project dependencies are resolved from common repositories
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        // fallback to plugin portal if needed
-        maven { url = uri("https://plugins.gradle.org/m2/") }
-    }
+plugins {
+    id("dev.flutter.flutter-plugin-loader") version "1.0.0"
+    id("com.android.application") version "8.9.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
 }
 
 rootProject.name = "gratify"
