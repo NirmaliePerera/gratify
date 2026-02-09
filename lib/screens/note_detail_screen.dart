@@ -1,15 +1,52 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gratify/models/journal_entry_model.dart';
 import 'package:gratify/db/database_helper.dart';
 import '../widgets/purple_header.dart';
+import '../utils/mood_utils.dart';
+
+String formatDateWithSuffix(DateTime date) {
+  int day = date.day;
+
+  String suffix;
+  if (day >= 11 && day <= 13) {
+    suffix = 'th';
+  } else {
+    switch (day % 10) {
+      case 1:
+        suffix = 'st';
+        break;
+      case 2:
+        suffix = 'nd';
+        break;
+      case 3:
+        suffix = 'rd';
+        break;
+      default:
+        suffix = 'th';
+    }
+  }
+
+  return '$day$suffix ${DateFormat('MMMM yyyy').format(date)}';
+}
+
+const Map<String, String> moodEmojis = {
+  'happy': '😊',
+  'sad': '😢',
+  'angry': '😠',
+  'calm': '😌',
+  'excited': '🤩',
+  'anxious': '😰',
+  'tired': '😴',
+};
 
 class NoteDetailScreen extends StatelessWidget {
   final JournalEntry note;
 
   const NoteDetailScreen({super.key, required this.note});
-  
+
   @override
   Widget build(BuildContext context) {
     // --- decode moods safely into Map<String,double> ---
@@ -54,7 +91,7 @@ class NoteDetailScreen extends StatelessWidget {
       }
     }
 
-    final formattedDate = note.date.split(' ').first;
+    final formattedDate = formatDateWithSuffix(DateTime.parse(note.date));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0FA),
@@ -82,13 +119,13 @@ class NoteDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const PurpleHeader(title: "Your Note"),
+              const PurpleHeader(title: "Your Note"), // Reusing the header for consistency
               const SizedBox(height: 20),
               // Date
               Text(
-                "Date: $formattedDate",
+                "Note added on: $formattedDate",
                 style: GoogleFonts.poppins(
-                  fontSize: 14,
+                  fontSize: 18,
                   color: Colors.grey[700],
                   fontWeight: FontWeight.w500,
                 ),
@@ -98,6 +135,8 @@ class NoteDetailScreen extends StatelessWidget {
               // Note text
               Text(
                 note.content,
+                maxLines: 5, // fixed visible area
+                overflow: TextOverflow.ellipsis, // adds "..."
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: const Color(0xFF503160),
@@ -112,7 +151,7 @@ class NoteDetailScreen extends StatelessWidget {
                 Text(
                   "Mood Ratings",
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF6C468E),
                   ),
@@ -137,7 +176,7 @@ class NoteDetailScreen extends StatelessWidget {
                           value: entry.value / 100,
                           minHeight: 10,
                           borderRadius: BorderRadius.circular(20),
-                          color: const Color(0xFF6C468E),
+                          color: colorForValue(entry.value),
                           backgroundColor: Colors.grey[300],
                         ),
                       ],
