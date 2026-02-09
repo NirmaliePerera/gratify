@@ -5,6 +5,7 @@ import 'package:gratify/models/journal_entry_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'add_notes_screen.dart';
 import 'note_detail_screen.dart';
+import '../widgets/purple_header.dart';
 
 class ViewNotesScreen extends StatefulWidget {
   const ViewNotesScreen({super.key});
@@ -68,8 +69,8 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
             noteDate.month == selectedDay.month &&
             noteDate.day == selectedDay.day;
       });
-    } catch (e) {
-      foundNote = null; // if no matching note is found
+    } catch (_) {
+      foundNote = null;
     }
 
     if (foundNote == null) {
@@ -83,7 +84,9 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => NoteDetailScreen(note: foundNote!)),
+        MaterialPageRoute(
+          builder: (context) => NoteDetailScreen(note: foundNote!),
+        ),
       ).then((_) => _loadNotes());
     }
   }
@@ -92,96 +95,101 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF6C468E),
-        title: Text(
-          "Your Notes",
-          style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TableCalendar(
-              focusedDay: _focusedDay,
-              firstDay: DateTime(2020),
-              lastDay: DateTime(2100),
-              calendarFormat: CalendarFormat.month,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onDaySelected: _onDaySelected,
-              headerStyle: HeaderStyle(
-                titleCentered: true,
-                formatButtonVisible: false,
-                titleTextStyle: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF503160),
+
+      body: Column(
+        children: [
+          const PurpleHeader(title: "Your Notes"), //Reusing the hearder
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Card(
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-              daysOfWeekStyle: DaysOfWeekStyle(
-                weekdayStyle: GoogleFonts.poppins(
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
-                weekendStyle: GoogleFonts.poppins(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              calendarStyle: CalendarStyle(
-                todayDecoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFF6C468E), width: 20),
-                  shape: BoxShape.circle,
-                ),
-                selectedDecoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF503160), Color(0xFFA565C6)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                markerDecoration: const BoxDecoration(
-                  color: Color(0xFF6C468E),
-                  shape: BoxShape.circle,
-                ),
-                outsideDaysVisible: false,
-              ),
-              calendarBuilders: CalendarBuilders(
-                markerBuilder: (context, day, events) {
-                  if (_hasNoteForDay(day)) {
-                    return Positioned(
-                      bottom: 6,
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF6C468E),
-                          shape: BoxShape.circle,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TableCalendar(
+                    focusedDay: _focusedDay,
+                    firstDay: DateTime(2020),
+                    lastDay: DateTime(2100),
+                    calendarFormat: CalendarFormat.month,
+                    selectedDayPredicate: (day) =>
+                        isSameDay(_selectedDay, day),
+                    onDaySelected: _onDaySelected,
+
+                    headerStyle: HeaderStyle(
+                      titleCentered: true,
+                      formatButtonVisible: false,
+                      titleTextStyle: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF503160),
+                      ),
+                    ),
+
+                    daysOfWeekStyle: DaysOfWeekStyle(
+                      weekdayStyle: GoogleFonts.poppins(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w500,
+                      ),
+                      weekendStyle: GoogleFonts.poppins(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    calendarStyle: CalendarStyle(
+                      todayDecoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFF6C468E),
+                          width: 2,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      selectedDecoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF503160),
+                            Color(0xFFA565C6)
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
-                    );
-                  }
-                  return null;
-                },
+                      markerDecoration: const BoxDecoration(
+                        color: Color(0xFF6C468E),
+                        shape: BoxShape.circle,
+                      ),
+                      outsideDaysVisible: false,
+                    ),
+
+                    calendarBuilders: CalendarBuilders(
+                      markerBuilder: (context, day, events) {
+                        if (_hasNoteForDay(day)) {
+                          return Positioned(
+                            bottom: 6,
+                            child: Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF6C468E),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          );
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

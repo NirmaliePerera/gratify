@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../db/database_helper.dart';
 import '../models/journal_entry_model.dart';
+import '../widgets/purple_header.dart';
+
 //import 'dart:convert';
 
 class AddNotesScreen extends StatefulWidget {
@@ -137,197 +139,165 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
       backgroundColor: const Color(0xFFF8F4FB),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // purple header with rounded bottom
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF6C468E),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
-                  ),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+              const PurpleHeader(title: "Add Note"),
+
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back button
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      color: Colors.white,
-                      onPressed: () => Navigator.pop(context),
-                      tooltip: 'Back',
+                    Text(
+                      formattedDate,
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF503160),
+                      ),
                     ),
 
-                    // Title (centered visually)
-                    Expanded(
+                    const SizedBox(height: 16),
+
+                    Align(
+                      alignment: AlignmentGeometry.centerLeft,
                       child: Text(
-                        "Add Note",
-                        textAlign: TextAlign.center,
+                        "What are you most grateful for?",
                         style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
 
-                    //Invisible spacer to keep title centered (same width as IconButton)
-                    SizedBox(width: 48),
+                    const SizedBox(height: 8),
+
+                    TextField(
+                      controller: _contentController,
+                      maxLines: 5,
+                      maxLength: _maxChars,
+                      decoration: InputDecoration(
+                        hintText: "Type here...",
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                        filled: true,
+                        fillColor: Colors.white,
+                        counterText: "",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: const BorderSide(color: Color(0xFFA565C6)),
+                        ),
+                      ),
+                    ),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "$_currentLen/$_maxChars",
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: _currentLen < _minChars
+                              ? Colors.red
+                              : Colors.grey[600],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Rate your moods today...",
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    _buildMoodSlider(
+                      "😄",
+                      happy,
+                      (val) => setState(() => happy = val),
+                    ),
+                    _buildMoodSlider("😌", calm, (val) => setState(() => calm = val)),
+                    _buildMoodSlider("😢", sad, (val) => setState(() => sad = val)),
+                    _buildMoodSlider(
+                      "🥱",
+                      tired,
+                      (val) => setState(() => tired = val),
+                    ),
+                    _buildMoodSlider(
+                      "😡",
+                      angry,
+                      (val) => setState(() => angry = val),
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Cancel button
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFF6C468E)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 18,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            "Cancel",
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF6C468E),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+
+                        //Add Note button
+                        ElevatedButton(
+                          onPressed: _saveNote,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6C468E),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 18,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            "Add Note",
+                            style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              Text(
-                formattedDate,
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF503160),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              Align(
-                alignment: AlignmentGeometry.centerLeft,
-                child: Text(
-                  "What are you most grateful for?",
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    color: Colors.grey[800],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              TextField(
-                controller: _contentController,
-                maxLines: 5,
-                maxLength: _maxChars,
-                decoration: InputDecoration(
-                  hintText: "Type here...",
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
-                  filled: true,
-                  fillColor: Colors.white,
-                  counterText: "",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(color: Color(0xFFA565C6)),
-                  ),
-                ),
-              ),
-
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  "$_currentLen/$_maxChars",
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: _currentLen < _minChars
-                        ? Colors.red
-                        : Colors.grey[600],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Rate your moods today...",
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    color: Colors.grey[800],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              _buildMoodSlider(
-                "😄",
-                happy,
-                (val) => setState(() => happy = val),
-              ),
-              _buildMoodSlider("😌", calm, (val) => setState(() => calm = val)),
-              _buildMoodSlider("😢", sad, (val) => setState(() => sad = val)),
-              _buildMoodSlider(
-                "🥱",
-                tired,
-                (val) => setState(() => tired = val),
-              ),
-              _buildMoodSlider(
-                "😡",
-                angry,
-                (val) => setState(() => angry = val),
-              ),
-
-              const SizedBox(height: 30),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // Cancel button
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(color: Color(0xFF6C468E)),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 18,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      "Cancel",
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF6C468E),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-
-                  //Add Note button
-                  ElevatedButton(
-                    onPressed: _saveNote,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6C468E),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 18,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: Text(
-                      "Add Note",
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-            ],
+            ],          
           ),
         ),
       ),

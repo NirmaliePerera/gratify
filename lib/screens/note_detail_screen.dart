@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gratify/models/journal_entry_model.dart';
 import 'package:gratify/db/database_helper.dart';
+import '../widgets/purple_header.dart';
 
 class NoteDetailScreen extends StatelessWidget {
   final JournalEntry note;
 
   const NoteDetailScreen({super.key, required this.note});
-
+  
   @override
   Widget build(BuildContext context) {
     // --- decode moods safely into Map<String,double> ---
@@ -57,7 +58,7 @@ class NoteDetailScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0FA),
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: const Color(0xFF6C468E),
         title: Text(
           "Your Note",
@@ -70,7 +71,7 @@ class NoteDetailScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-      ),
+      ),*/
 
       // ------------------------
       // BODY CONTENT
@@ -81,6 +82,8 @@ class NoteDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const PurpleHeader(title: "Your Note"),
+              const SizedBox(height: 20),
               // Date
               Text(
                 "Date: $formattedDate",

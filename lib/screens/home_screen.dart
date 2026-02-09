@@ -6,6 +6,8 @@ import 'set_passcode_screen.dart';
 import 'add_notes_screen.dart';
 import 'view_notes_screen.dart';
 import 'send_feedback_screen.dart';
+import '../widgets/purple_header.dart';
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -78,29 +80,8 @@ class HomeScreen extends StatelessWidget {
       body: Column(
         children: [
           //Purple Header Bar
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: const BoxDecoration(
-              color: const Color(0xFF6C468E),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
-              ),
-            ),
+          const PurpleHeader(title: "Gratify", showBack: false),
 
-            child: Text(
-              "Gratify",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.pacifico(
-                fontSize: 32,
-                fontWeight: FontWeight.w400,
-                color: Colors.white,
-              ),
-            ),
-          ),
-
-          //Title
           const SizedBox(height: 20),
 
           // Subtitle
