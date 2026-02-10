@@ -17,7 +17,6 @@ class ViewNotesScreen extends StatefulWidget {
 class _ViewNotesScreenState extends State<ViewNotesScreen> {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
   List<JournalEntry> _notes = [];
 
   @override
@@ -33,18 +32,24 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
 
   bool _hasNoteForDay(DateTime day) {
     return _notes.any((note) {
-      final noteDate = DateTime.parse(note.date);
-      return noteDate.year == day.year &&
-          noteDate.month == day.month &&
-          noteDate.day == day.day;
+      final parsed = DateTime.tryParse(note.date);
+      if (parsed == null) return false;
+      return parsed.year == day.year &&
+          parsed.month == day.month &&
+          parsed.day == day.day;
     });
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    // Normalize both dates to date-only to avoid time zone / time-of-day issues
     final now = DateTime.now();
-    final isFutureDate = selectedDay.isAfter(
-      DateTime(now.year, now.month, now.day),
+    final today = DateTime(now.year, now.month, now.day);
+    final selected = DateTime(
+      selectedDay.year,
+      selectedDay.month,
+      selectedDay.day,
     );
+    final isFutureDate = selected.isAfter(today);
 
     if (isFutureDate) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -57,27 +62,25 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
     }
 
     setState(() {
-      _selectedDay = selectedDay;
       _focusedDay = focusedDay;
     });
 
+    // Find note for the selected day safely
     JournalEntry? foundNote;
-    try {
-      foundNote = _notes.firstWhere((entry) {
-        final noteDate = DateTime.parse(entry.date);
-        return noteDate.year == selectedDay.year &&
-            noteDate.month == selectedDay.month &&
-            noteDate.day == selectedDay.day;
-      });
-    } catch (_) {
-      foundNote = null;
+    for (final entry in _notes) {
+      final parsed = DateTime.tryParse(entry.date);
+      if (parsed == null) continue;
+      if (isSameDay(parsed, selected)) {
+        foundNote = entry;
+        break;
+      }
     }
 
     if (foundNote == null) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AddNotesScreen(selectedDate: selectedDay),
+          builder: (context) => AddNotesScreen(selectedDate: selected),
         ),
       ).then((_) => _loadNotes());
       return;
@@ -116,7 +119,7 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
                     lastDay: DateTime(2100),
                     calendarFormat: CalendarFormat.month,
                     selectedDayPredicate: (day) =>
-                        isSameDay(_selectedDay, day),
+                        false, // no persistent highlight
                     onDaySelected: _onDaySelected,
 
                     headerStyle: HeaderStyle(
@@ -141,20 +144,18 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
                     ),
 
                     calendarStyle: CalendarStyle(
-                      todayDecoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFF6C468E),
-                          width: 2,
-                        ),
+                      todayDecoration: const BoxDecoration(
+                        color: Color(0xFFDCC9F0),
                         shape: BoxShape.circle,
+                      ),
+                      todayTextStyle: GoogleFonts.poppins(
+                        color: Color(0xFF5B2E83),
+                        fontWeight: FontWeight.w700,
                       ),
                       selectedDecoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF503160),
-                            Color(0xFFA565C6)
-                          ],
+                          colors: [Color(0xFF503160), Color(0xFFA565C6)],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -185,6 +186,25 @@ class _ViewNotesScreenState extends State<ViewNotesScreen> {
                       },
                     ),
                   ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: SizedBox(
+              width: double.infinity,
+              child: Image.asset(
+                'assets/images/note.png',
+                height: 140,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                errorBuilder: (context, error, stack) => const Icon(
+                  Icons.book_rounded,
+                  size: 64,
+                  color: Color(0xFF6C468E),
                 ),
               ),
             ),
