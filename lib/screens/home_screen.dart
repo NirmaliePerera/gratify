@@ -8,7 +8,6 @@ import 'view_notes_screen.dart';
 import 'send_feedback_screen.dart';
 import '../widgets/purple_header.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -110,7 +109,7 @@ class HomeScreen extends StatelessWidget {
 
                 icon: const Icon(Icons.add, color: Color(0xFF6C468E)),
                 label: Text(
-                  "Add your first note",
+                  "It's time to jot it down!",
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     color: const Color(0xFF6C468E),
@@ -173,7 +172,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
 
-          const Spacer(),
+          const SizedBox(height: 32),
 
           // Logout Button
           Padding(
