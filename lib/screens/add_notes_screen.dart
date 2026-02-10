@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../db/database_helper.dart';
 import '../models/journal_entry_model.dart';
 import '../widgets/purple_header.dart';
+import '../utils/mood_utils.dart';
 
 //import 'dart:convert';
 
@@ -47,18 +48,9 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
     super.dispose();
   }
 
-  //helper for dynamic slider color based on value
-  Color _colorForValue(double value) {
-    if (value < 20) return Colors.red;
-    if (value < 40) return const Color.fromARGB(255, 225, 255, 0);
-    if (value < 60) return const Color.fromARGB(255, 61, 241, 127);
-    if (value < 80) return const Color.fromARGB(255, 86, 106, 255);
-    return const Color.fromARGB(255, 235, 65, 254);
-  }
-
   Future<void> _saveNote() async {
     print("🟣 Save Note button pressed"); //temporary
-    
+
     final content = _contentController.text.trim();
 
     if (content.isEmpty) {
@@ -123,7 +115,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
         ],
       ),
     );
-  } 
+  }
 
   void _showMessage(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
@@ -145,7 +137,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
               // purple header with rounded bottom
               const PurpleHeader(title: "Add Note"),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
@@ -160,7 +152,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
 
                     Align(
                       alignment: AlignmentGeometry.centerLeft,
@@ -188,7 +180,9 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                         counterText: "",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
-                          borderSide: const BorderSide(color: Color(0xFFA565C6)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFA565C6),
+                          ),
                         ),
                       ),
                     ),
@@ -206,7 +200,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 10),
 
                     Align(
                       alignment: Alignment.centerLeft,
@@ -227,8 +221,16 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                       happy,
                       (val) => setState(() => happy = val),
                     ),
-                    _buildMoodSlider("😌", calm, (val) => setState(() => calm = val)),
-                    _buildMoodSlider("😢", sad, (val) => setState(() => sad = val)),
+                    _buildMoodSlider(
+                      "😌",
+                      calm,
+                      (val) => setState(() => calm = val),
+                    ),
+                    _buildMoodSlider(
+                      "😢",
+                      sad,
+                      (val) => setState(() => sad = val),
+                    ),
                     _buildMoodSlider(
                       "🥱",
                       tired,
@@ -240,54 +242,52 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                       (val) => setState(() => angry = val),
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 15),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Cancel button
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: const BorderSide(color: Color(0xFF6C468E)),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 18,
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(color: Color(0xFF6C468E)),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            "Cancel",
-                            style: GoogleFonts.poppins(
-                              color: const Color(0xFF6C468E),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
+                            child: Text(
+                              "Cancel",
+                              style: GoogleFonts.poppins(
+                                color: const Color(0xFF6C468E),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
 
-                        //Add Note button
-                        ElevatedButton(
-                          onPressed: _saveNote,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6C468E),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 18,
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _saveNote,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6C468E),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: Text(
-                            "Add Note",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                            child: Text(
+                              "Add Note",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
@@ -297,7 +297,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
                   ],
                 ),
               ),
-            ],          
+            ],
           ),
         ),
       ),
@@ -321,7 +321,7 @@ class _AddNoteScreenState extends State<AddNotesScreen> {
               min: 0,
               max: 100,
               divisions: 10,
-              activeColor: _colorForValue(value),
+              activeColor: colorForValue(value),
               onChanged: onChanged,
             ),
           ),
